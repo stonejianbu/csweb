@@ -1,0 +1,26 @@
+// Copyright 2024 huangyouguang <stonehuang90@gmail.com>. All rights reserved.
+// Use of this source code is governed by a MIT style
+// license that can be found in the LICENSE file.
+
+syntax = "proto3";
+package common;
+option go_package = "github.com/stonejianbu/csweb/protos/common;common";
+import "validate/validate.proto";
+
+message Status {
+  string traceId = 1;
+  int32 code = 2;
+  string message = 3;
+}
+
+message Response {
+  Status status = 1;
+  string instanceId = 2;
+}
+
+message Page {
+  int32 page = 1[(buf.validate.field).int32.gte = 1];
+  int32 perPage = 2[(buf.validate.field).int32.gte = 1];
+  int32 totalPage = 3;
+  int32 totalRecord = 4;
+}
