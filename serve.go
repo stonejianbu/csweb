@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// ServeInterface impl your server
 type ServeInterface interface {
 	GRPCServe(s *grpc.Server) error
 	HTTPServe(mux *runtime.ServeMux, opts []grpc.DialOption) error
