@@ -99,6 +99,7 @@ func (that *App) startHttpServer(g *run.Group) {
 			return err
 		}
 		gatewayHttp.Handler = csweb_utils.WithTrace(mux)
+		gatewayHttp.Handler = Cors(gatewayHttp.Handler)
 		return gatewayHttp.ListenAndServe()
 	}, func(err error) {
 		if err := gatewayHttp.Close(); err != nil {
@@ -166,4 +167,24 @@ func (that *App) startMetricsServer(g *run.Group) {
 		_ = httpSrv.Close()
 	})
 
+}
+
+func Cors(handler http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		method := r.Method
+		origin := r.Header.Get("Origin")
+		if origin != "" {
+			// 允许来源配置
+			w.Header().Set("Access-Control-Allow-Origin", "*") // 可将将 * 替换为指定的域名
+			w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE, PATCH")
+			w.Header().Set("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization")
+			w.Header().Set("Access-Control-Expose-Headers", "Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Cache-Control, Content-Language, Content-Type")
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+		}
+		if method == "OPTIONS" {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		handler.ServeHTTP(w, r)
+	})
 }
